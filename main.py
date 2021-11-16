@@ -13,7 +13,9 @@ fileTypes = [
     "mp3",
 ]
 
-#Functions
+#         #
+#Functions#
+#         #
 
 #Configures the grid columns and rows
 def gridConfig():
@@ -26,13 +28,14 @@ def gridConfig():
 
 #Functionality for the submit button
 def submit():
+    if len(newFileEntry.get()) == 0 or len(fileEntry.get()) == 0:
+        print('At least 1 value is left blank. Please fill them all in.')
+        return
     print(filename+' Submitted!')
     print("Type: "+defDrop.get())
     
-    sound = AudioSegment.from_file(path)
-    fileKeys = filename.rsplit(".", 1)
-    fileNoExt = fileKeys[0]
-    newFileName = "/Users/ethan/Downloads/Output/"+fileNoExt+"."+defDrop.get()
+    sound = AudioSegment.from_file("/Users/ethan/Downloads/Output/"+fileEntry.get()+"."+defDrop.get())
+    newFileName = "/Users/ethan/Downloads/Output/"+newFileEntry.get()+"."+defDrop.get()
     sound.export(newFileName, format = defDrop.get(), bitrate = "128k")
     print(filename+' Converted')
 
@@ -50,27 +53,32 @@ def browseFiles():
                                                        ("all files",
                                                         "*.*")))
 
-    fileKeys = path.rsplit("/", 1)
-    filename = fileKeys[1]
+    fileKeysOne = path.rsplit("/", 1)
+    fileKeysTwo = fileKeysOne[1].rsplit(".", 1)
+    filename = fileKeysTwo[0]
     fileEntry.delete(0, 'end')
     fileEntry.insert(0, filename)
 
-    fileKeys = path.rsplit(".", 1)
-    fileExt = fileKeys[1]
+    if len(newFileEntry.get()) == 0:
+        newFileEntry.insert(0, filename)
+
+    fileExt = fileKeysTwo[1]
     extLabel.config(text = '.'+fileExt)
 
 #Lays out items in the grid
 def defineGUI():
     gridConfig()
-    fileEntryLabel.grid(column = 0, row = 0, sticky = 'e')
-    fileExtLabel.grid(column = 2, row = 0, sticky = 'e')
-    convExtLabel.grid(column = 2, row = 2, sticky = 'ne')
+    fileEntryLabel.grid(column = 0, row = 0, sticky = 'se')
+    fileExtLabel.grid(column = 2, row = 0, sticky = 'se')
+    convExtLabel.grid(column = 2, row = 2, sticky = 'e')
+    newFileLabel.grid(column = 0, row = 2, sticky = 'e')
 
-    fileEntry.grid(column = 1, row = 0, sticky = 'w')
-    extLabel.grid(column = 3, row = 0, sticky = 'w')
+    fileEntry.grid(column = 1, row = 0, sticky = 'sw')
+    extLabel.grid(column = 3, row = 0, sticky = 'sw')
     fileButton.grid(column = 1, row = 1, sticky = 'nw')
-    extDrop.grid(column = 3, row = 2, sticky = 'nw')
-    submitButton.grid(column = 1, row = 2, sticky = '')
+    extDrop.grid(column = 3, row = 2, sticky = 'w')
+    newFileEntry.grid(column = 1, row = 2, sticky = 'w')
+    submitButton.grid(column = 1, row = 3, sticky = '')
 
 
 
@@ -89,10 +97,12 @@ fileEntry = ttk.Entry(root, width = 30)
 extLabel = ttk.Label(root, width = 6)
 fileButton = ttk.Button(root, text = 'Browse Files', command = browseFiles, width = 10)
 submitButton = ttk.Button(root, text = 'submit', command = submit, width = 10)
+newFileEntry = ttk.Entry(root, width = 30)
 
 convExtLabel = tk.Label(root, text = 'to:', bg = 'white')
 fileExtLabel = tk.Label(root, text = 'from:', bg = 'white')
 fileEntryLabel = tk.Label(root, text = 'filename:', bg = 'white')
+newFileLabel = tk.Label(root, text = 'new filename:', bg = 'white')
 
 #Define dropdown menu
 defDrop = tk.StringVar()
